@@ -1,4 +1,3 @@
-
 import time
 
 def test_button_add_to_basket_exist_on_page(browser):
