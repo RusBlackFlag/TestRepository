@@ -1,19 +1,26 @@
+import os
+
 import pytest
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.options import Options as ChromeOptions
 
 
 def pytest_addoption(parser):
-    parser.addoption('--language', action='store', default='en', help='Chose language')
+    parser.addoption("--language", default="en", help="Choose language")
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def browser(request):
-    lang = request.config.getoption('language')
-    options = Options()
-    options.add_experimental_option('prefs', {'intl.accept_languages': lang})
-    print('\nstart Chrome browser...')
+    language_to_use = request.config.getoption("language")
+    options = ChromeOptions()
+    options.add_argument(f"--lang={language_to_use}")
+
+    if os.getenv("TRAVIS") is not None:
+        options.add_argument("--no-sandbox")
+        options.add_argument("--headless")
+
     browser = webdriver.Chrome(options=options)
+
     yield browser
-    print('\nquit Chrome browser...')
+
     browser.quit()
